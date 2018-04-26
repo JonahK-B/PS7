@@ -93,7 +93,26 @@ crimeFreq <- crimeTypeByDay %>%
   group_by(Description, DateOccur) %>%
   dplyr::summarise(count = n()) ##Specifying dplyr because there is a conflict with plyr
 
+#For looking at changes in data over time, we're going to take just the March occurances
+crimeFreq$DateOccur <- as.Date(crimeFreq$DateOccur, format = "%m/%d/%Y")
 
+crimeFreq <- crimeFreq %>% 
+  arrange(DateOccur) %>%
+  filter(DateOccur >= "2018-03-01")
 
+##Histogram
 
+ggplot(data=crimeFreq) +
+  geom_histogram(mapping = aes(x = DateOccur), binwidth = 1) +
+  labs(title = "March Overall Crime Over Time")+
+  xlab("Date")+
+  ylab("Overall Crimes")
+
+##Scatterplot
+
+ggplot(data=crimeFreq, 
+       mapping = aes(x = DateOccur, y = count)) + geom_point(na.rm = TRUE) +
+  labs(title = "March Overall Crime Over Time")+
+  xlab("Date")+
+  ylab("Overall Crimes")
   
