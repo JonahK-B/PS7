@@ -78,19 +78,18 @@ arrange(robberyProportion, desc(robProp)) ## District 5 has the highest percenta
 #5
 library(ggplot2)
 
-crimeTypeByDay <- select(March2018, DateOccur, Description)## subsetting data set for day and type of crime
+crimeTypeByDay <- select(March2018, DateOccur, Neighborhood)## subsetting data set for day and type of crime
 ##I set up a new table for any modified information rather than directly changing the original so I have the original for reference in case I accidently change anything.
 crimeTypeByDay <- as_tibble(crimeTypeByDay)
 
 crimeTypeByDay$DateOccur <- substr(crimeTypeByDay$DateOccur, 1,10)  ##Isolating date, removing timestamp
-crimeTypeByDay$Description <- strsplit(as.character(crimeTypeByDay$Description), "-") ## Generalizing types of crimes
-crimeTypeByDay$Description <- sapply(crimeTypeByDay$Description, function(x) x[1])
+
 
 
 ##Counting number of different types of crimes by day
 ## (some of these crimes happened before March 2018, but they are all reported in March)
-crimeFreq <- crimeTypeByDay %>%
-  group_by(Description, DateOccur) %>%
+crimeFreq <- March2018 %>%
+  group_by(District, DateOccur, Description) %>%
   dplyr::summarise(count = n()) ##Specifying dplyr because there is a conflict with plyr
 
 #For looking at changes in data over time, we're going to take just the March occurances
@@ -108,11 +107,26 @@ ggplot(data=crimeFreq) +
   xlab("Date")+
   ylab("Overall Crimes")
 
-##Scatterplot
 
+##Scatterplot
 ggplot(data=crimeFreq, 
        mapping = aes(x = DateOccur, y = count)) + geom_point(na.rm = TRUE) +
   labs(title = "March Overall Crime Over Time")+
+  xlab("Date")+
+  ylab("Overall Crimes")
+
+
+##7
+
+##Made into a factor to get the colors disticnt rather than scaled
+crimeFreq$District <- as.factor(crimeFreq$District)
+
+##Scatterplot
+ggplot(data=crimeFreq, 
+       mapping = aes(x = DateOccur, y = count)) + 
+  geom_point(na.rm = TRUE) +
+  geom_point(aes(color = District)) +
+  labs(title = "March Overall Crime Over Time by District")+
   xlab("Date")+
   ylab("Overall Crimes")
   
